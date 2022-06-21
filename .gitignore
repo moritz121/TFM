@@ -3,7 +3,11 @@ resources/Mini_DDSM_Upload/*
 resources/gan/*
 resources/keras_gan/*
 resources/preprocess/*
-resources/preprocess/*
-resources/preprocess/*
+images/*
+model/*
+dataset/*
+celeba-dataset/*
+gan_model/*
+*.h5
 .idea
 __pycache__

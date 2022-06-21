@@ -1,4 +1,6 @@
 import os
+import random
+
 import cv2
 
 def read_img(path, tag):
@@ -14,3 +16,10 @@ def read_img(path, tag):
             img_list.update({file: [img, tag]})
         i += 1
     return img_list
+
+def split_test_train(img_array, ratio):
+
+    split_size = int(len(img_array) * (1-ratio))
+    random.shuffle(img_array)
+
+    return img_array[split_size:], img_array[:split_size]

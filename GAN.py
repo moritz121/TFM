@@ -102,7 +102,7 @@ class GAN():
         model.add(Activation("relu"))
         model.add(Conv2D(self.channels, kernel_size=4, padding="same"))
         model.add(Activation("tanh"))
-        model.add(Reshape((28, 28)))
+        #model.add(Reshape((28, 28)))
 
         model.summary()
 
@@ -124,10 +124,6 @@ class GAN():
 
         y_gen = np.ones((batch_size, 1))
         noise = np.random.normal(0, 1, [batch_size, self.latent_dim])
-
-        print(noise.shape)
-        print(y_gen.shape)
-        exit(0)
 
         # Hyperparam
 

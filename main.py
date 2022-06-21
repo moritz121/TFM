@@ -5,46 +5,37 @@ import itertools
 import numpy as np
 from tqdm import tqdm
 
+from misc import split_test_train
+from GAN_2 import GAN_2 as GAN2
 from preprocess import preprocess
-from GAN import GAN
 
-#import pandas as pd
-
-from keras.datasets import mnist
+def scale_images(images):
+	# convert from unit8 to float32
+	images = images.astype('float32')
+	# scale from [0,255] to [-1,1]
+	images = (images - 127.5) / 127.5
+	return images
 
 if __name__ == '__main__':
 
-    img_size = (28, 28)
-    height, width = img_size
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-    gan_conf = {'img_size': img_size}
+    img_size = (64, 64)
+    latent_dim = 128
 
     img_array = preprocess(img_size=img_size)
 
-    X_train = (img_array.astype(np.float32) - 127.5) / 127.5
-    X_train = np.expand_dims(X_train, axis=3)
+    X_train = scale_images(img_array)
 
-    gan = GAN(gan_conf)
+    gan_conf = {'data_shape': img_array.shape,
+                'latent_dim': latent_dim,
+                'n_layers_gen': 1,
+                'n_layers_disc': 2,
+                'n_epochs': 1500,
+                'n_batch': 64}
+
+    gan = GAN2(gan_conf)
     gan.train(X_train)
-    '''
 
-    img_size = (28, 28)
-    height, width = img_size
 
-    gan_conf = {'img_size': img_size}
 
-    img_array = preprocess(img_size=img_size)
-
-    print(img_array.shape)
-    print(img_array.reshape(img_array.shape[0], height*width).shape)
-
-    (X_train, _), (_, _) = mnist.load_data()
-    print(X_train[0].shape)
-    print(type(X_train[0]))
-    print('-----------------------------')
-    X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-    X_train = np.expand_dims(X_train, axis=3)
-    print(X_train[0].shape)
-    print(type(X_train[0]))
-    print('-----------------------------')
-    '''
