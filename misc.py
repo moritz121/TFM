@@ -1,10 +1,12 @@
 import os
+import random
+
 import cv2
 
 def read_img(path, tag):
     img_list = {}
     files = os.listdir(path)
-    max_sample_size = 100
+    max_sample_size = 1000000000000000000
     i = 0
     for file in files:
         if i > max_sample_size:

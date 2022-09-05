@@ -1,3 +1,5 @@
+import time
+
 from misc import read_img
 from tqdm import tqdm
 import cv2
@@ -101,6 +103,7 @@ def preprocess(img_size):
     print("Cancer images loaded")
     img_list_normal = read_img(path_normal_img, 'normal')
     print("Normal images loaded")
+    time.sleep(0.5)
 
     img_list_complete = dict(img_list_normal, **img_list_cancer)
     img_list_complete = dict(img_list_complete, ** img_list_benign)
@@ -116,6 +119,9 @@ def preprocess(img_size):
         img = remove_lines(img)
 
         img = cv2.resize(img,img_size)
+        img = img.reshape((img_size[0],img_size[1],1))
+
+        #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
 
         cv2.imwrite('./resources/preprocess/' + tag + '/' + file, img)
         img_array_complete.append(img)

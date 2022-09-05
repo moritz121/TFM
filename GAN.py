@@ -8,15 +8,16 @@ from keras.layers import Dense, Dropout, Input, Reshape, Flatten
 from keras.models import Model,Sequential
 from keras.datasets import mnist
 from tqdm import tqdm
-from keras.layers.advanced_activations import LeakyReLU
+#from keras.layers.advanced_activations import LeakyReLU
+from keras.layers import LeakyReLU
 from tensorflow.keras.optimizers import Adam
 
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers.convolutional import UpSampling2D, Conv2D
 
 class GAN():
-    def __init__(self, conf):
-        self.img_size = conf['img_size']
+    def __init__(self):
+        self.img_size = (28,28, 1)
         self.channels = 1
         self.latent_dim = 100
     '''
@@ -57,7 +58,7 @@ class GAN():
 
     '''
 
-    def discriminator(self, loss, nodes):
+    def discriminator(self):
 
         model = Sequential()
 
@@ -102,7 +103,7 @@ class GAN():
         model.add(Activation("relu"))
         model.add(Conv2D(self.channels, kernel_size=4, padding="same"))
         model.add(Activation("tanh"))
-        model.add(Reshape((28, 28)))
+        #model.add(Reshape((28, 28)))
 
         model.summary()
 
@@ -125,12 +126,6 @@ class GAN():
         y_gen = np.ones((batch_size, 1))
         noise = np.random.normal(0, 1, [batch_size, self.latent_dim])
 
-        print(noise.shape)
-        print(y_gen.shape)
-        exit(0)
-
-        # Hyperparam
-
         nodes = [256, 512, 1024]
 
         loss = self.loss_binary_cross()
@@ -140,9 +135,9 @@ class GAN():
 
         discriminator = self.discriminator(loss, nodes=nodes)
         discriminator.summary()
+        discriminator.compile(loss=loss, optimizer=self.optimizer_adam(), metrics=['accuracy'])
 
         gan = self.gan(generator=generator, discriminator=discriminator, loss=loss)
-        #gan = KerasClassifier(build_fn=self.gan)
         gan.summary()
 
         batch_count = X_train.shape[0] / batch_size
@@ -171,7 +166,6 @@ class GAN():
                 discriminator.trainable=True
                 discriminator.train_on_batch(X, y_dis)
 
-                # WTF?
                 noise= np.random.normal(0,1, [batch_size, 100])
                 y_gen = np.ones((batch_size, 1))
 

@@ -5,46 +5,49 @@ import itertools
 import numpy as np
 from tqdm import tqdm
 
+from GAN import GAN as GAN
+from GAN_2 import WGAN as GAN2
+from GAN_4 import GAN_2 as GAN4
 from preprocess import preprocess
-from GAN import GAN
 
-#import pandas as pd
+import torch
 
-from keras.datasets import mnist
+def scale_images(images):
+	images = images.astype('float32')
+	images = (images - 127.5) / 127.5
+	return images
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 if __name__ == '__main__':
 
-    img_size = (28, 28)
-    height, width = img_size
+    img = cv2.imread('resources/keras_gan/GAN2_9.png')
 
-    gan_conf = {'img_size': img_size}
+    img_size = (64, 64)
+    latent_dim = 128
 
     img_array = preprocess(img_size=img_size)
 
-    X_train = (img_array.astype(np.float32) - 127.5) / 127.5
-    X_train = np.expand_dims(X_train, axis=3)
+    X_train = scale_images(img_array)
+    '''
+    gan1 = GAN()
+    gan1.train(X_train)
+    exit(0)
 
-    gan = GAN(gan_conf)
+    gan2 = GAN2()
+    gan2.train(500, X_train)
+    exit(0)
+
+    '''
+
+    gan_conf = {'data_shape': img_array.shape,
+                'latent_dim': latent_dim,
+                'n_layers_gen': 1,
+                'n_layers_disc': 2,
+                'n_epochs': 6000,
+                'n_batch': 64}
+
+    gan = GAN4(gan_conf)
     gan.train(X_train)
-    '''
 
-    img_size = (28, 28)
-    height, width = img_size
 
-    gan_conf = {'img_size': img_size}
-
-    img_array = preprocess(img_size=img_size)
-
-    print(img_array.shape)
-    print(img_array.reshape(img_array.shape[0], height*width).shape)
-
-    (X_train, _), (_, _) = mnist.load_data()
-    print(X_train[0].shape)
-    print(type(X_train[0]))
-    print('-----------------------------')
-    X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-    X_train = np.expand_dims(X_train, axis=3)
-    print(X_train[0].shape)
-    print(type(X_train[0]))
-    print('-----------------------------')
-    '''
