@@ -20,43 +20,6 @@ class GAN():
         self.img_size = (28,28, 1)
         self.channels = 1
         self.latent_dim = 100
-    '''
-    def discriminator(self, loss, nodes):
-        discriminator = Sequential()
-
-        discriminator.add(Dense(units=nodes[0], input_dim=self.img_size[0]*self.img_size[1]))
-        discriminator.add(LeakyReLU(0.2))
-
-        discriminator.add(Dense(units=nodes[1]))
-        discriminator.add(LeakyReLU(0.2))
-        discriminator.add(Dropout(0.3))
-
-        discriminator.add(Dense(units=nodes[2]))
-        discriminator.add(LeakyReLU(0.2))
-
-        discriminator.add(Dense(units=1, activation='sigmoid'))
-
-        discriminator.compile(loss=loss, optimizer=self.optimizer_adam())
-
-        return discriminator
-
-    def generator(self, loss, nodes):
-        generator = Sequential()
-
-        generator.add(Dense(units=nodes[2], input_dim=100))
-        generator.add(LeakyReLU(0.2))
-
-        generator.add(Dense(units=nodes[1]))
-        generator.add(LeakyReLU(0.2))
-
-        generator.add(Dense(units=nodes[0]))
-        generator.add(LeakyReLU(0.2))
-
-        generator.add(Dense(units=self.img_size[0]*self.img_size[1], activation='tanh'))
-        generator.compile(loss=loss, optimizer=self.optimizer_adam())
-        return generator
-
-    '''
 
     def discriminator(self):
 
@@ -88,7 +51,7 @@ class GAN():
 
         return Model(img, validity)
 
-    def generator(self, loss, nodes):
+    def generator(self, loss):
         model = Sequential()
 
         model.add(Dense(7 * 7 * 128, activation="relu", input_dim=self.latent_dim))
@@ -130,10 +93,10 @@ class GAN():
 
         loss = self.loss_binary_cross()
 
-        generator = self.generator(loss, nodes=nodes)
+        generator = self.generator(loss)
         generator.summary()
 
-        discriminator = self.discriminator(loss, nodes=nodes)
+        discriminator = self.discriminator()
         discriminator.summary()
         discriminator.compile(loss=loss, optimizer=self.optimizer_adam(), metrics=['accuracy'])
 
@@ -147,35 +110,25 @@ class GAN():
 
                 noise = np.random.normal(0, 1, [batch_size, 100])
 
-                # Gen img from noise input
-
                 gen_img = generator.predict(noise)
 
-                # Get random set of real img
-
                 image_batch = X_train[np.random.randint(low=0, high=X_train.shape[0], size=batch_size)]
-
-                # Mix fake and real
 
                 X = np.concatenate([image_batch, gen_img])
 
                 y_dis = np.zeros(2*batch_size)
                 y_dis[:batch_size] = 0.9
 
-                # Pre-train discriminator
                 discriminator.trainable=True
                 discriminator.train_on_batch(X, y_dis)
 
                 noise= np.random.normal(0,1, [batch_size, 100])
                 y_gen = np.ones((batch_size, 1))
 
-                # Fix discriminator weights
                 discriminator.trainable = False
 
-                # Train GAN
                 history = gan.train_on_batch(noise, y_gen)
 
-                #print(gan.metrics_names)
                 print('Epoch ' + str(e) + ' Batch ' + str(i) + ': Loss -> ' + str(history[0]) + ' | Accuracy -> ' + str(history[1]))
 
                 if e == 1 or e% 20 == 0:
@@ -193,16 +146,5 @@ class GAN():
         generated_images = generator.predict(noise)
         generated_images = generated_images.reshape(100, 28, 28)
 
-        cv2.imwrite('resources/gan/gan_generated_image %d.png' % epoch, generated_images[-1])
-
-        """
-        plt.figure(figsize=figsize)
-        for i in range(generated_images.shape[0]):
-            plt.subplot(dim[0], dim[1], i + 1)
-            plt.imshow(generated_images[i], interpolation='nearest')
-            plt.axis('off')
-        plt.tight_layout()
-        plt.savefig('resources/gan/gan_generated_image %d.png' % epoch)
-        plt.close('all')
-        """
+        cv2.imwrite('resources/gan1/gan_generated_image %d.png' % epoch, generated_images[-1])
 

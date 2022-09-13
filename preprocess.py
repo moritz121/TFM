@@ -118,8 +118,8 @@ def preprocess(img_size):
 
         img = remove_lines(img)
 
-        img = cv2.resize(img,img_size)
-        img = img.reshape((img_size[0],img_size[1],1))
+        img = cv2.resize(img,(img_size[0], img_size[1]))
+        img = img.reshape((img_size[0],img_size[1],img_size[2]))
 
         #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
 

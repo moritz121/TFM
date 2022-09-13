@@ -180,5 +180,5 @@ class GAN_2():
                 axs[i,j].imshow(img)
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("resources/keras_gan/GAN_%d.png" % epoch)
+        fig.savefig("resources/gan4/GAN_%d.png" % epoch)
         plt.close(fig)
